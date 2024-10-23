@@ -1,4 +1,5 @@
 use std::env;
+use std::error::Error;
 use std::fs;
 use std::process;
 
@@ -14,8 +15,20 @@ fn main() {
     println!("In file: {}", config.filename);
 
     // 获取文件中字符串
-    let contents: String = fs::read_to_string(config.filename).expect("Failed to read file");
-    println!("contents: {}", contents);
+    if let Err(e) = run(config) {
+        println!("fn run failed: {}", e);
+
+        process::exit(1);
+    }
+}
+
+// 动态的返回错误信息，不需要指明错误
+fn run(config: Config) -> Result<(), Box<dyn Error>> {
+    // ?能够简化赋值真正的string,还是返回函数错误的err
+    let contents = fs::read_to_string(config.filename)?;
+
+    println!("contens: {}", contents);
+    Ok(())
 }
 
 struct Config {
