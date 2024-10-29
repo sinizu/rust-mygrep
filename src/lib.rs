@@ -28,3 +28,27 @@ impl Config {
         Ok(Config { query, filename })
     }
 }
+
+pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
+    vec![]
+}
+
+// 测试用例
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn one_result() {
+        let query = "language";
+        let contents = "
+        Rust        
+        is a systems programming language.
+        else other";
+
+        assert_eq!(
+            vec!["is a systems programming language"],
+            search(query, "is a systems programming language")
+        );
+    }
+}
