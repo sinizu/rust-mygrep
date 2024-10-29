@@ -6,7 +6,11 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
     // ?能够简化赋值真正的string,还是返回函数错误的err
     let contents = fs::read_to_string(config.filename)?;
 
-    println!("contens: {}", contents);
+    // println!("contens: {}", contents);
+    for line in search(&config.query, &contents) {
+        println!("line: {}", line);
+    }
+
     Ok(())
 }
 
@@ -30,7 +34,6 @@ impl Config {
 }
 
 pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
-    // vec![]
     let mut results = Vec::new();
 
     for line in contents.lines() {
@@ -50,14 +53,28 @@ mod tests {
     #[test]
     fn one_result() {
         let query = "language";
-        let contents = "
-        Rust        
-        is a systems programming language.
-        else other";
+        let contents = "\
+Rust        
+is a systems programming language.
+else other";
 
         assert_eq!(
-            vec!["is a systems programming language"],
-            search(query, "is a systems programming language")
+            vec!["is a systems programming language."],
+            search(query, contents)
+        );
+    }
+
+    #[test]
+    fn no_result() {
+        let query = "no_found";
+        let contents = "\
+Rust        
+is a systems programming language.
+else other";
+
+        assert_eq!(
+            Vec::<&str>::new(),
+            search(query, contents)
         );
     }
 }
