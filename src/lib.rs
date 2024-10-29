@@ -1,22 +1,29 @@
 use std::error::Error;
 use std::fs;
+use std::env;
 
 // 动态的返回错误信息，不需要指明错误
 pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
     // ?能够简化赋值真正的string,还是返回函数错误的err
     let contents = fs::read_to_string(config.filename)?;
 
-    // println!("contens: {}", contents);
-    for line in search(&config.query, &contents) {
-        println!("line: {}", line);
-    }
+    let results = if config.is_sensitive {
+        search(&config.query, &contents)
+    }   else {
+        search_insensetive(&config.query, &contents)
+    };
 
+    for line in results {
+        println!("{}", line);
+    }
+    
     Ok(())
 }
 
 pub struct Config {
     pub query: String,
     pub filename: String,
+    pub is_sensitive: bool,
 }
 
 impl Config {
@@ -29,7 +36,10 @@ impl Config {
 
         let query = args[1].clone();
         let filename = args[2].clone();
-        Ok(Config { query, filename })
+
+        let is_sensitive = env::var("CASE_INSENSITIVE").is_err();
+
+        Ok(Config { query, filename, is_sensitive})
     }
 }
 
