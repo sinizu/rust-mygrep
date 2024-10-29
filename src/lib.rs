@@ -45,16 +45,29 @@ pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
     return results;
 }
 
+pub fn search_insensetive<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
+    let query = query.to_lowercase();
+    let mut results = Vec::<&str>::new();
+
+    for line in contents.lines() {
+        if line.to_lowercase().contains(&query) {
+            results.push(line);
+        }
+    }
+
+    results
+}
+
 // 测试用例
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn one_result() {
+    fn case_one_result() {
         let query = "language";
         let contents = "\
-Rust        
+Rust
 is a systems programming language.
 else other";
 
@@ -65,16 +78,24 @@ else other";
     }
 
     #[test]
-    fn no_result() {
+    fn case_no_result() {
         let query = "no_found";
         let contents = "\
-Rust        
+Rust
 is a systems programming language.
 else other";
 
-        assert_eq!(
-            Vec::<&str>::new(),
-            search(query, contents)
-        );
+        assert_eq!(Vec::<&str>::new(), search(query, contents));
+    }
+
+    #[test]
+    fn case_no_insensetive() {
+        let query = "rus";
+        let contents = "\
+Rust
+is a systems programming language.
+else other";
+
+        assert_eq!(vec!["Rust"], search_insensetive(query, contents));
     }
 }
